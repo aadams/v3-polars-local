@@ -60,12 +60,17 @@ def createLiq(bn, pool, data, data_path):
     )
 
     liquidity_distribution = (
-        tl.join(tu, on="tick", how="outer")
-        .fill_null(0)
-        .with_columns(liquidity=(pl.col("liquidity_lower") + pl.col("liquidity_upper")))
-        .sort(pl.col("tick"))
-        .select(["tick", "liquidity"])
-        .with_columns(liquidity=(pl.col("liquidity").cumsum()))
+        (pl.DataFrame(pl.concat([tl['tick'], tu['tick']]).unique())
+            .join(tl, on = 'tick', how = 'left')
+            .join(tu, on = 'tick', how = 'left')
+            .with_columns(liquidity_lower = pl.col('liquidity_lower').fill_null(0),
+                        liquidity_upper = pl.col('liquidity_upper').fill_null(0)
+                        )
+            .with_columns(liquidity=(pl.col("liquidity_lower") + pl.col("liquidity_upper")))
+            .sort(pl.col("tick"))
+            .select(["tick", "liquidity"])
+            .with_columns(liquidity=(pl.col("liquidity").cum_sum()))
+        )
     )
 
     return liquidity_distribution
