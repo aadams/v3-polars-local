@@ -1,4 +1,7 @@
 # v3-polars
+
+## Note
+The version on the [Uniswap v3 Github](https://github.com/Uniswap/v3-polars) has a bug inside the fee calculations. It is updated here.
  
 ## Uniswap v3 simulator
 ### Features 
